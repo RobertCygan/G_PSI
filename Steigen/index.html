@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' ; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data:; worker-src 'self' blob:; connect-src 'self' https://tiles.openfreemap.org; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Steigen | G-PSI Analytics</title>
+<meta name="description" content="Utgiftsanalyse for Steigen kommune 2016–2025: fakturagrunnlag fra databasen og KOSTRA (SSB). Utviklet av G-PSI GovTech Solutions.">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="js/vendor/maplibre-gl.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/calculator.css">
+<link rel="stylesheet" href="css/property.css">
+<link rel="stylesheet" href="css/integration.css">
+</head>
+<body class="intro-active">
+<a class="skip-link" href="#mainContent">Gå til innhold</a>
+<noscript><p>Aktiver JavaScript for å bruke analyseverktøyene.</p></noscript>
+
+<!-- ============================ INTRO ============================ -->
+<div id="intro" role="dialog" aria-modal="true" aria-label="Introduksjon">
+  <video id="introVideo" muted playsinline preload="metadata" poster="assets/img/intro-poster.jpg" aria-label="Animert G-PSI-logo">
+    <source src="assets/video/intro.mp4" type="video/mp4">
+  </video>
+  <div class="intro-sweep"></div>
+  <button class="intro-play" id="introPlay" type="button">Start introduksjon</button>
+  <div class="intro-bar"><span id="introProgress"></span></div>
+  <div class="intro-tag">G-PSI GovTech Solutions · Steigen kommune</div>
+  <button class="intro-skip" id="introSkip" type="button">Hopp over ›</button>
+</div>
+
+<!-- bakgrunn: kretsmønster + vannmerke -->
+<svg class="bg-circuit" aria-hidden="true" width="100%" height="100%">
+  <defs>
+    <pattern id="circ" width="220" height="220" patternUnits="userSpaceOnUse">
+      <path d="M0 40 H70 L90 60 H150 M150 60 V120 L170 140 H220 M30 220 V170 L50 150 H110 M110 150 V100" fill="none" stroke="rgba(92,200,255,.07)" stroke-width="1"/>
+      <circle cx="150" cy="60" r="2.2" fill="rgba(92,200,255,.16)"/>
+      <circle cx="110" cy="100" r="2.2" fill="rgba(92,200,255,.16)"/>
+      <circle cx="70" cy="40" r="1.6" fill="rgba(92,200,255,.12)"/>
+      <rect x="166" y="136" width="8" height="8" fill="none" stroke="rgba(92,200,255,.12)"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#circ)"/>
+</svg>
+<img class="bg-watermark" src="assets/img/gpsi-emblem.png" alt="" aria-hidden="true">
+
+<div id="app">
+  <!-- ============================ TOPP ============================ -->
+  <header class="topbar">
+    <div class="client municipality"><img id="clientLogo" src="assets/img/steigen-logo-light.png" alt="Steigen kommune"><div class="period">2016 – 2025<small>Regnskapsår</small></div></div>
+    <nav class="pagenav" aria-label="Sider">
+      <button type="button" data-page="oversikt" aria-current="page" title="Oversikt">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg><span>Oversikt</span></button>
+      <button type="button" data-page="kategorier" title="Kategorianalyse">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Kategorier</span></button>
+      <button type="button" data-page="leverandorer" title="Leverandører">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 7h12v9H2zM14 10h4l3 3v3h-7z"/><circle cx="6" cy="18" r="2" fill="currentColor"/><circle cx="17" cy="18" r="2" fill="currentColor"/></svg><span>Leverandører</span></button>
+      <button type="button" data-page="kostra" title="KOSTRA">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg><span>KOSTRA</span></button>
+      <button type="button" data-page="transaksjoner" title="Transaksjoner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor"/></svg><span>Transaksjoner</span></button>
+      <button type="button" data-page="datakvalitet" title="Datakvalitet og metode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>Datakvalitet</span></button>
+<button type="button" data-page="kalkulator" title="Eiendomsskattekalkulator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h2m4 0h2"/></svg><span>Kalkulator</span></button>
+<button type="button" data-page="eiendomsskatt" title="Eiendomsskatt 2010–2026"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-7 9 7v11H3zM9 21v-8h6v8"/></svg><span>Eiendomsskatt</span></button>
+<button type="button" data-page="database" title="Database og datagrunnlag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 4 18 4 18 0V5M3 12c0 4 18 4 18 0"/></svg><span>Database</span></button>
+    </nav>
+    <div class="brand company"><div class="emblem"><span class="ring"></span><img src="assets/img/gpsi-emblem.png" alt="G-PSI"></div><div class="titles"><h1>UTGIFTSANALYSE</h1><span class="sub"><b>G-PSI</b> Analytics · Steigen kommune</span></div><button class="icon-btn" id="themeBtn" type="button" title="Bytt lyst/mørkt tema" aria-label="Bytt tema"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button></div>
+  </header>
+
+  <main id="mainContent" tabindex="-1">
+    <!-- ======================= VERKTØYLINJE ======================= -->
+    <div class="toolbar">
+      <div id="toolbarLeft"></div>
+      <div class="filters" id="filters">
+        <div class="fld"><label for="fYear">År</label><div class="sel"><select id="fYear"></select></div></div>
+        <div class="fld"><label for="fQ">Kvartal</label><div class="sel"><select id="fQ">
+          <option value="">Alle</option><option value="1">K1</option><option value="2">K2</option><option value="3">K3</option><option value="4">K4</option></select></div></div>
+        <div class="fld"><label for="fTO">Tjenesteområde</label><div class="sel"><select id="fTO"></select></div></div>
+        <div class="fld"><label for="fReg">Regnskap</label><div class="sel"><select id="fReg">
+          <option value="">Drift + investering</option><option value="drift">Drift</option><option value="inv">Investering</option></select></div></div>
+        <div class="fld f-measure"><span class="lbl">Visning</span>
+          <div class="seg" id="fMeasure" role="group" aria-label="Visning">
+            <button type="button" data-m="nom" aria-pressed="true" title="Løpende kroner">Nominelt</button>
+            <button type="button" data-m="real" aria-pressed="false" title="Faste 2025-kroner, deflatert med KPI (SSB 03014)">2025-kr</button>
+            <button type="button" data-m="cap" aria-pressed="false" title="Kroner per innbygger (folkemengde 31.12)">Per innb.</button>
+            <button type="button" data-m="capreal" aria-pressed="false" title="Faste 2025-kr per innbygger">Per innb. 2025-kr</button>
+          </div></div>
+        <div class="fld"><span class="lbl">&nbsp;</span><label class="switch" title="Ta med kompensasjonsberettiget merverdiavgift (art 429)"><input type="checkbox" id="fMva"> Inkl. mva</label></div>
+        <div class="fld"><span class="lbl">&nbsp;</span><button class="reset" id="fReset" type="button" title="Nullstill alle filtre" aria-label="Nullstill filtre">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button></div>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+
+    <!-- ============================ OVERSIKT ============================ -->
+    <section class="page active" id="p-oversikt" aria-label="Oversikt">
+      <div class="warnbox" id="ovWarn"></div>
+      <div class="grid-ov">
+        <div class="card c-bars">
+          <div class="card-head"><div><h3>Utgifter etter tjenesteområde</h3><p class="cap" id="capBars">Drift og investering · klikk en stolpe for å filtrere</p></div></div>
+          <div class="chart tall" id="chBars"></div>
+          <div class="src" id="srcBars"></div>
+        </div>
+        <div class="card c-donut">
+          <div class="card-head"><div><h3>Fordeling etter art</h3><p class="cap">KOSTRA-artsgrupper · klikk et segment for å filtrere</p></div></div>
+          <div class="chart tall" id="chDonut"></div>
+          <div class="src" id="srcDonut"></div>
+        </div>
+        <div class="card c-tree">
+          <div class="card-head"><div><h3>Vare-/tjenestegruppe og konto</h3><p class="cap">Klikk en gruppe for å filtrere · ⊞ for å åpne</p></div></div>
+          <div class="tree" id="tree"></div>
+          <div class="src" id="srcTree"></div>
+        </div>
+        <div class="card c-trend">
+          <div class="card-head"><div><h3>Utvikling 2016–2025</h3><p class="cap" id="trendCap">Nominelt og i faste 2025-kroner (KPI)</p></div>
+            <div class="card-tools"><div class="seg" id="trendGran"><button type="button" data-g="y" aria-pressed="true">År</button><button type="button" data-g="q" aria-pressed="false">Kvartal</button><button type="button" data-g="m" aria-pressed="false">Måned</button></div></div></div>
+          <div class="chart" id="chTrend"></div>
+          <div class="src" id="srcTrend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ KATEGORIER ============================ -->
+    <section class="page" id="p-kategorier" aria-label="Kategorianalyse">
+      <div class="card">
+        <div class="card-head">
+          <div><h3>Første og siste år, endring og CAGR</h3><p class="cap" id="catCap"></p></div>
+          <div class="card-tools">
+            <div class="seg" id="catSrc"><button type="button" data-s="kostra" aria-pressed="true">KOSTRA (SSB)</button><button type="button" data-s="faktura" aria-pressed="false">Fakturagrunnlag</button></div>
+            <div class="sel"><select id="catDim" aria-label="Dimensjon"></select></div>
+            <div class="sel"><select id="catFrom" aria-label="Fra år"></select></div>
+            <div class="sel"><select id="catTo" aria-label="Til år"></select></div>
+          </div>
+        </div>
+        <div id="catWarn"></div>
+        <div class="dtable-wrap" id="catTable" style="max-height:none"></div>
+        <div class="src" id="srcCat"></div>
+      </div>
+      <div class="grid-21 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Utvikling per kategori</h3><p class="cap" id="heatCap">Varmekart, beløp per år</p></div>
+            <div class="card-tools"><div class="seg" id="heatMode"><button type="button" data-h="abs" aria-pressed="true">Beløp</button><button type="button" data-h="share" aria-pressed="false">Andel %</button><button type="button" data-h="idx" aria-pressed="false">Indeks</button></div></div></div>
+          <div class="chart tall" id="chHeat"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Bidrag til endring</h3><p class="cap" id="wfCap">Realendring fra første til siste år</p></div></div>
+          <div class="chart tall" id="chWaterfall"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ LEVERANDØRER ============================ -->
+    <section class="page" id="p-leverandorer" aria-label="Leverandører">
+      <div class="grid-21">
+        <div class="card">
+          <div class="card-head"><div><h3>Største leverandører</h3><p class="cap">Topp 15 · klikk for å filtrere hele dashboardet</p></div></div>
+          <div class="chart tall" id="chTopLev"></div>
+          <div class="src" id="srcTopLev"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Konsentrasjon</h3><p class="cap" id="paretoCap">Kumulativ andel av utgiftene</p></div></div>
+          <div class="chart tall" id="chPareto"></div>
+        </div>
+      </div>
+      <div class="grid-12 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Leverandørbransjer</h3><p class="cap">Bransje hovedkategori</p></div></div>
+          <div class="chart tall" id="chBransje"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Leverandørregister</h3><p class="cap" id="levCap"></p></div></div>
+          <div class="tbl-tools">
+            <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="levSearch" type="search" placeholder="Søk leverandør eller bransje…"></div>
+          </div>
+          <div class="dtable-wrap" id="levTable" style="max-height:420px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ KOSTRA ============================ -->
+    <section class="page" id="p-kostra" aria-label="KOSTRA">
+      <div class="kpis" id="kostraKpis"></div>
+      <div class="grid-2 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Brutto driftsutgifter</h3><p class="cap">Mill. kr, nominelt og i faste 2025-kroner (KPI)</p></div></div>
+          <div class="chart" id="chKTot"></div>
+          <div class="src">Database: <b>SSB tabell 12362</b> (kommunekonsern, sum funksjoner 100–393), KPI fra <b>SSB 03014</b>, 2016–2025.</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Utgifter etter art</h3><p class="cap">Mill. kr, kommunekasse</p></div>
+            <div class="card-tools"><div class="seg" id="kArtMode"><button type="button" data-a="nom" aria-pressed="true">Nominelt</button><button type="button" data-a="real" aria-pressed="false">2025-kr</button></div></div></div>
+          <div class="chart" id="chKArt"></div>
+          <div class="src">Database: <b>SSB tabell 12367</b> (kommunekasse), 2016–2025. Lønn er fratrukket sykelønnsrefusjon (art 710).</div>
+        </div>
+      </div>
+      <div class="grid-21 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Per innbygger mot sammenlignbare kommuner</h3><p class="cap" id="kCmpCap"></p></div>
+            <div class="card-tools">
+              <div class="seg" id="kCmpArt"><button type="button" data-k="AGD10" aria-pressed="true">Brutto</button><button type="button" data-k="AGD2" aria-pressed="false">Netto</button></div>
+              <div class="sel"><select id="kCmpYear" aria-label="År"></select></div>
+            </div></div>
+          <div class="chart" id="chKCmp" style="height:600px"></div>
+          <div class="src">Database: <b>SSB tabell 12362</b>, kr per innbygger, KOSTRA-tjenesteområder (FGK). Områdene overlapper delvis (eiendomsforvaltning inngår også i andre områder).</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Totalt per innbygger</h3><p class="cap">Brutto driftsutgifter, kr per innbygger (nominelt)</p></div></div>
+          <div class="chart" id="chKCap" style="height:600px"></div>
+          <div class="src">Database: <b>SSB tabell 12362</b>. Brudd i KOSTRA-gruppene mellom 2019 og 2020.</div>
+        </div>
+      </div>
+      <div class="grid-12 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Brutto investeringsutgifter</h3><p class="cap">Mill. kr, Steigen</p></div></div>
+          <div class="chart" id="chKInv"></div>
+          <div class="src">Database: <b>SSB tabell 12362</b> (AGI5), 2016–2025.</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Avvik mot KOSTRA-gruppe 6</h3><p class="cap" id="kDevCap"></p></div></div>
+          <div class="dtable-wrap" id="kDevTable" style="max-height:380px"></div>
+          <div class="src">Beregnet: (Steigen − KOSTRA-gruppe 6) × innbyggere 31.12. Viser hva utgiftsnivået ville vært med gruppens nivå per innbygger – ikke et innsparingsestimat (struktur, bosettingsmønster og kvalitet er ikke justert).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ TRANSAKSJONER ============================ -->
+    <section class="page" id="p-transaksjoner" aria-label="Transaksjoner">
+      <div class="card">
+        <div class="card-head"><div><h3>Fakturalinjer</h3><p class="cap" id="txCap"></p></div></div>
+        <div class="tbl-tools">
+          <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="txSearch" type="search" placeholder="Søk leverandør, konto, funksjon, bilag…"></div>
+          <button class="btn" id="txCsv" type="button">⭳ Last ned CSV</button>
+          <span class="muted small" id="txInfo"></span>
+        </div>
+        <div class="dtable-wrap" id="txTable" style="max-height:640px"></div>
+        <div class="pager" id="txPager"></div>
+      </div>
+    </section>
+
+    <!-- ============================ DATAKVALITET ============================ -->
+    <section class="page" id="p-datakvalitet" aria-label="Datakvalitet og metode">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head"><div><h3>Dekning: fakturagrunnlag mot KOSTRA</h3><p class="cap">Driftskjøp og overføringer (ekskl. mva), mill. kr</p></div></div>
+          <div class="chart" id="chCov"></div>
+          <div class="src">Fakturagrunnlag: <b>regnskapsdatabasen</b>, driftsregnskap, art 100–480 ekskl. 429. KOSTRA: <b>SSB 12367</b> kommunekasse, AGD50 + AGD51 + AG34.</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Fakturalinjer per måned og bilagsserie</h3><p class="cap">Antall utgiftslinjer i uttrekket per måned</p></div></div>
+          <div class="chart" id="chLines"></div>
+          <div class="src">Database: <b>regnskapsdatabasen</b>, bilagsnummer gruppert etter serie.</div>
+        </div>
+      </div>
+      <div class="grid-2 mt">
+        <div class="card">
+          <h3>Hendelser og brudd i seriene</h3>
+          <p class="cap">Fakta = dokumentert i data · Hypotese = mulig forklaring som må verifiseres</p>
+          <div class="events" id="events"></div>
+        </div>
+        <div class="card method" id="method"></div>
+      </div>
+    </section>
+<section class="page" id="p-kalkulator" aria-label="Eiendomsskattekalkulator"><div class="module-notice"><b>Veiledende beregning</b><span>Satser fra det leverte beregningsgrunnlaget. Kontroller årets vedtak før overslaget brukes.</span></div><section id="eskatt-kalkulator" aria-label="Kalkulator for eiendomsskatt">
+<div class="esk-grid">
+  <div class="card">
+    <ol class="steps" id="steps"></ol>
+
+    <!-- STEG 1 -->
+    <div class="panel" data-step="1">
+      <h2 tabindex="-1">Bolig</h2>
+      <p class="sub">Arealet er bruksareal (BRA), slik det er registrert i Matrikkelen. Du finner det i byggesøknaden eller ved å kontakte kommunen. Skal du bare se på andre bygg eller tomt, kan du hoppe over hele dette steget.</p>
+
+      <fieldset>
+        <legend>Hva slags eiendom er det?</legend>
+        <div class="cards c2" id="typeList"></div>
+        <p class="hint" style="margin-top:10px">Velg Bolig eller Fritid etter bygningens registrerte bruk. Garasje, anneks og naust legges til i neste steg.</p>
+        <p class="error" id="errType"></p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Bruksareal per etasje</legend>
+        <p class="hint">Har boligen flere hovedetasjer, legger du dem sammen.</p>
+        <div class="fields" id="floorFields"></div>
+        <p class="sum" aria-live="polite">Vektet areal: <b id="weighted">0 m²</b></p>
+        <p class="error" id="errArea"></p>
+      </fieldset>
+
+      <div class="divider"></div>
+
+      <fieldset>
+        <legend>Når ble boligen tatt i bruk?</legend>
+        <div class="cards c4" id="yearList"></div>
+        <p class="error" id="errYear"></p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Standard sammenlignet med andre bygg fra samme periode</legend>
+        <p class="hint">De fleste har normal standard. Endelig vurdering gjøres av kommunen ved besiktigelse.</p>
+        <div class="cards" id="stdList"></div>
+      </fieldset>
+
+      <div class="nav"><span></span><button class="btn" type="button" data-go="2">Neste: Andre bygg <span aria-hidden="true">→</span></button></div>
+    </div>
+
+    <!-- STEG 2 -->
+    <div class="panel" data-step="2" hidden>
+      <h2 tabindex="-1">Andre bygg</h2>
+      <p class="sub">Garasje, uthus, naust, anneks og lignende på samme eiendom. Bygninger på 15 m² eller mindre beskattes ikke.</p>
+      <div class="blist" id="blist"></div>
+      <p class="empty" id="bempty">Ingen andre bygg lagt til. Hopp over steget hvis eiendommen bare har bolig eller fritidsbolig.</p>
+      <button class="btn sec small" type="button" id="addB">+ Legg til bygning</button>
+      <p class="error" id="errBygg" role="alert"></p>
+      <div class="nav"><button class="btn sec" type="button" data-go="1"><span aria-hidden="true">←</span> Tilbake</button><button class="btn" type="button" data-go="3">Neste: Tomt og sone <span aria-hidden="true">→</span></button></div>
+    </div>
+
+    <!-- STEG 3 -->
+    <div class="panel" data-step="3" hidden>
+      <h2 tabindex="-1">Tomt og sone</h2>
+      <p class="sub">Tomten verdsettes med <span data-tomtpris></span> per m², med inntil <span data-tomtmaks></span>. Tomteareal kan stå tomt når du bare vil beregne bygg. Tomten beskattes først når bygning er tatt i bruk.</p>
+
+      <fieldset>
+        <legend class="sr-only">Tomt</legend>
+        <div class="fields">
+          <div class="field" id="fTomt"><label for="tomt">Tomteareal</label><div class="inbox"><input id="tomt" inputmode="decimal" autocomplete="off" aria-describedby="tomtHint errTomt"><span>m²</span></div><p class="fx" id="tomtHint">Areal etter målebrev</p></div>
+        </div>
+        <div class="cards" style="margin-top:14px">
+          <label class="opt"><input type="checkbox" id="noMaal"><span class="mark" aria-hidden="true"></span><span><b>Målebrev finnes ikke</b><small>Da settes tomtearealet til <span data-tomtmaks></span>.</small></span></label>
+          <label class="opt"><input type="checkbox" id="gard"><span class="mark" aria-hidden="true"></span><span><b>Boligen hører til et gårdsbruk i drift</b><small>Gårdbrukers bolig får 10 % reduksjon, og tomten regnes med inntil <span data-tomtgard></span>. Driftsbygninger på gårdsbruket er fritatt.</small></span></label>
+        </div>
+        <p class="error" id="errTomt"></p>
+      </fieldset>
+
+      <div class="divider"></div>
+
+      <div class="field" style="margin-bottom:26px">
+        <label for="sone">Sone (område)</label>
+        <p class="hint" id="soneHint">Sonefaktoren gjenspeiler prisnivået i området. Er du usikker, kontakt eiendomsskattekontoret.</p>
+        <select id="sone" aria-describedby="soneHint errSone"></select>
+        <p class="error" id="errSone"></p>
+      </div>
+
+      <fieldset>
+        <legend>Beliggenhet (ytre faktor)</legend>
+        <p class="hint">De fleste eiendommer har normal beliggenhet. Redusert faktor settes av kommunen ved besiktigelse når forhold rundt eiendommen trekker verdien ned.</p>
+        <div class="cards" id="ytreList"></div>
+      </fieldset>
+
+      <div class="nav"><button class="btn sec" type="button" data-go="2"><span aria-hidden="true">←</span> Tilbake</button><button class="btn" type="button" data-go="4">Se resultat <span aria-hidden="true">→</span></button></div>
+    </div>
+
+    <!-- STEG 4 -->
+    <div class="panel" data-step="4" hidden>
+      <h2 tabindex="-1">Slik er eiendomsskatten beregnet</h2>
+      <p class="sub" id="resSub"></p>
+      <div id="resMissing"></div>
+      <div id="resBody"></div>
+
+      <details>
+        <summary>Formelen kommunen bruker</summary>
+        <p class="formula">Takst = (bygningsareal × etasjefaktor × sats per m² + tomteareal × tomtepris) × sonefaktor × ytre faktor × indre faktor</p>
+        <p class="formula">Eiendomsskatt = (takst × <span data-red></span> − bunnfradrag) × skattesats</p>
+        <p>Årsskatten rundes ned til hele kroner. Det skrives ikke ut skatt når den er under 300 kr per eiendom, jf. eiendomsskatteloven § 14.</p>
+        <p>Kilder: «Rammer og retningslinjer for taksering i Steigen kommune 2019» (rev. 17.02.2020), <a href="https://www.steigen.kommune.no/tjenester/plan-bygg-brann-og-eiendom/eiendomsskatt/" target="_blank" rel="noopener">kommunens informasjon om eiendomsskatt</a>, <a href="https://www.kartverket.no/eiendom/lokal-matrikkelmyndighet/foringsinstruks-for-matrikkelen" target="_blank" rel="noopener">Kartverkets føringsinstruks</a> og <a href="https://lovdata.no/dokument/NL/lov/1975-06-06-29/§14" target="_blank" rel="noopener">eiendomsskatteloven § 14</a>.</p>
+      </details>
+
+      <div class="nav no-print"><button class="btn sec" type="button" data-go="3"><span aria-hidden="true">←</span> Endre opplysninger</button><span style="display:flex;gap:12px;flex-wrap:wrap"><button class="btn sec" type="button" id="reset">Start på nytt</button><button class="btn" type="button" id="print">Skriv ut / lagre som PDF</button></span></div>
+    </div>
+  </div>
+
+  <aside aria-label="Overslag">
+    <div class="box on-dark">
+      <h2 id="boxTitle">Foreløpig overslag</h2>
+      <div class="big" id="bigVal" aria-live="polite" aria-atomic="true">–</div>
+      <div class="unit" id="bigUnit">Fyll inn opplysningene for å se overslaget</div>
+      <hr>
+      <div id="boxRows"></div>
+      <div id="whatIf"></div>
+    </div>
+    <div class="info">
+      <p><b>Dette er et overslag.</b> Kommunens takst bygger på opplysninger i Matrikkelen og utvendig besiktigelse. Indre og ytre faktor fastsettes av sakkyndig takstnemnd.</p>
+      <p>Stemmer ikke areal eller byggeår? Gi beskjed til kommunen, eller les om <a href="https://www.steigen.kommune.no/tjenester/plan-bygg-brann-og-eiendom/eiendomsskatt/" target="_blank" rel="noopener noreferrer">klage på eiendomsskatt</a>.</p>
+    </div>
+  </aside>
+</div>
+<div class="mbar" aria-hidden="true"><span>Overslag</span><b id="mVal">–</b></div>
+</section></section>
+<section class="page" id="p-eiendomsskatt" aria-label="Eiendomsskatt 2010–2026">
+<div class="app">
+  <header class="top">
+    <div class="module-heading"><span class="eyebrow">EIENDOMSANALYSE</span><h2>Eiendomsskatt per grunnkrets</h2><p>Historiske data og geografisk sammenligning · 2010–2026</p></div>
+    <div class="yearbox" role="group" aria-label="År">
+      <button class="btn icon" id="prevYear" title="Forrige år" aria-label="Forrige år">‹</button>
+      <label class="sr" for="yearSelect">Velg år</label>
+      <select class="yr num" id="yearSelect" aria-label="Velg år"></select>
+      <button class="btn icon" id="nextYear" title="Neste år" aria-label="Neste år">›</button>
+      <div class="year-track">
+        <label class="sr" for="yearSlider">År på tidslinjen</label>
+        <input type="range" id="yearSlider">
+        <div class="year-ticks" id="yearTicks" role="group" aria-label="Velg år på tidslinjen"></div>
+      </div>
+      <button class="btn" id="playBtn" aria-pressed="false" title="Spill av årene">▶ Spill av</button>
+    </div>
+    <div class="ctl"><button type="button" class="btn" id="loadBasemap">Vis bakgrunnskart</button>
+      <button class="btn primary" id="resetBtn">Nullstill valg</button>
+    </div>
+  </header>
+
+  <div class="property-layout">
+    <section id="mapwrap" aria-label="Kart over grunnkretser">
+      <div id="map"></div>
+      <div class="nomap" id="nomap">Kartet kunne ikke tegnes. Bruk tabellen og grafene for å utforske de samme tallene.</div>
+      <div class="mapbar">
+        <button class="btn card" id="ctlToggle" aria-expanded="true" aria-controls="mapctl" hidden>⚙ Kartvalg</button>
+        <div class="card mapctl" id="mapctl">
+          <div class="field"><label for="fritakSel">Fritak</label>
+            <select id="fritakSel">
+              <option value="all">Alle eiendommer</option>
+              <option value="tax">Kun skattepliktige</option>
+              <option value="ex">Kun fritatte (§ 5 / § 7)</option>
+            </select>
+          </div>
+          <div class="metric-fields">
+            <div class="field"><label for="colorSel">Velg måltall – farge</label><select id="colorSel"></select></div>
+            <div class="field" id="colorCategoryField" hidden><label id="colorCategoryLabel" for="colorCategory">Kategori – farge</label><select id="colorCategory"></select></div>
+          </div>
+          <div class="metric-fields">
+            <div class="field"><label for="heightSel">Velg måltall – høyde</label><select id="heightSel"></select></div>
+            <div class="field" id="heightCategoryField" hidden><label id="heightCategoryLabel" for="heightCategory">Kategori – høyde</label><select id="heightCategory"></select></div>
+          </div>
+          <div class="toggles">
+            <label><input type="checkbox" id="fixedScale" checked> Fast skala for alle år</label>
+            <label><input type="checkbox" id="quantScale"> Kvantilskala</label>
+            <label>Høyde <input type="range" id="exag" min="0.2" max="3" step="0.1" value="1" aria-label="Høydeoverdrivelse"></label>
+            <button class="btn" id="btn3d" aria-pressed="true">3D</button>
+            <button class="btn" id="btnView" title="Tilbakestill kartvinkel">Nullstill visning</button>
+          </div>
+        </div>
+      </div>
+      <div class="card legend" id="legend"></div>
+      <div class="card sel-chip" id="selChip" hidden>
+        <div class="name"><span id="selName"></span><small id="selSub"></small></div>
+        <button class="btn" id="selClear">Nullstill valg</button>
+      </div>
+      <div class="navbtns">
+        <button class="btn" id="zoomIn" aria-label="Zoom inn">+</button>
+        <button class="btn" id="zoomOut" aria-label="Zoom ut">−</button>
+      </div>
+      <div class="card tip" id="tip" role="tooltip"></div>
+      <div class="map-credit"><span id="basemapStatus" role="status"></span>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> · <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a></div>
+    </section>
+
+    <aside class="panel">
+      <div class="sec-h"><h2 id="scopeTitle">Hele kommunen</h2><span class="scope" id="scopeSub"></span></div>
+      <div class="kpis" id="kpis"></div>
+
+      <div class="sec-h">
+        <h2><span id="chartHeading">Utvikling</span> <span id="chartMetricName" style="font-weight:500;color:var(--muted)"></span></h2>
+        <div class="seg" id="chartViews" role="group" aria-label="Grafvisning">
+          <button id="viewLine" aria-pressed="true">Linje</button>
+          <button id="viewBars" aria-pressed="false">Topp 8 kretser</button>
+        </div>
+      </div>
+      <div class="chartbox"><canvas id="chart" aria-label="Utvikling over tid"></canvas></div>
+
+      <div class="sec-h"><h2>Grunnkretser <span id="tableYear" style="font-weight:500;color:var(--muted)"></span></h2>
+        <span class="scope">Klikk en rad for å velge</span></div>
+      <div class="tablewrap">
+        <table id="tbl">
+          <thead><tr>
+            <th data-k="navn" aria-sort="none">Grunnkrets<span class="arr"></span></th>
+            <th data-k="skatt" aria-sort="descending">Eiendomsskatt<span class="arr"></span></th>
+            <th data-k="n" aria-sort="none">Antall<span class="arr"></span></th>
+            <th data-k="colorValue" aria-sort="none"><small>Farge</small><span id="colorTableLabel"></span><span class="arr"></span></th>
+            <th data-k="heightValue" id="heightTableHeader" aria-sort="none"><small>Høyde</small><span id="heightTableLabel"></span><span class="arr"></span></th>
+            <th data-k="andel" aria-sort="none">Andel<span class="arr"></span></th>
+          </tr></thead>
+          <tbody></tbody>
+          <tfoot></tfoot>
+        </table>
+      </div>
+      <div class="table-note" id="tableMetricNote"></div>
+
+      <div class="note" id="datanote">
+        <h3>Datagrunnlag</h3>
+        <div id="noteBody"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+</section>
+<section class="page" id="p-database" aria-label="Database"><div class="database-intro card"><span class="eyebrow">DATAGRUNNLAG OG FORVALTNING</span><h2>Én felles database. Tre analyseverktøy.</h2><p>Regnskap, eiendomsskatt og bygningsdata samlet i en strukturert SQL-database. Datagrunnlaget har dokumentert opprinnelse og beholder de opprinnelige avgrensningene.</p><div class="database-stats" id="databaseStats"></div></div><div class="grid-2 mt"><div class="card"><h3>Datasett</h3><div class="dataset-list"><article><b>Regnskapsdatabase</b><span>2016–2025 · fakturalinjer, leverandører og KOSTRA</span></article><article><b>Eiendomsskattedatabase</b><span>2010–2026 · aggregater per grunnkrets og fritak</span></article><article><b>Bygningsregister</b><span>Registrert tilstand · bygningstype og bygningsstatus</span></article><article><b>Beregningsparametere</b><span>Takseringsregler, soner og satser for kalkulatoren</span></article></div></div><div class="card"><h3>Kvalitet og metode</h3><p>SSB er datakilde for KOSTRA, konsumprisindeks og folkemengde. Fakturagrunnlaget dekker utvalgte utgifter og er ikke et fullstendig kommuneregnskap.</p><p>Eiendomsskatt vises på aggregert nivå. Bygningsregisteret er et øyeblikksbilde og skal ikke tolkes som en historisk årsserie.</p><button class="btn" type="button" data-goto="datakvalitet">Se datakvalitet og definisjoner →</button><p class="muted small">Kalkulatoren gir et veiledende overslag. Årets satser og bunnfradrag må kontrolleres mot kommunens vedtak.</p></div></div><div class="card mt"><h3>SQL og integrasjon</h3><p>Prosjektpakken inneholder SQLite-database, SQL-skjema, komplett SQL-eksport og dokumenterte visninger for rapportering. Et lokalt lesebasert API følger med. Databasefiler og administrasjonsverktøy publiseres ikke av den medfølgende serveren.</p><code>SELECT aar, sum_belop_kr FROM v_utgifter_per_aar ORDER BY aar;</code></div></section>
+  </main>
+
+<footer class="site-footer"><div class="footer-main"><div class="footer-brand"><img src="assets/img/gpsi-emblem.png" alt=""><div><b>G-PSI GOVTECH SOLUTIONS</b><p>Innsikt som gir bedre beslutninger.</p><span>Analyse av kommunal økonomi og eiendom</span></div></div><nav aria-label="Analyseverktøy"><b>Utforsk</b><button type="button" data-goto="oversikt">Utgiftsanalyse</button><button type="button" data-goto="kalkulator">Eiendomsskattekalkulator</button><button type="button" data-goto="eiendomsskatt">Eiendomsanalyse</button></nav><nav aria-label="Informasjon"><b>Datagrunnlag</b><button type="button" data-goto="database">Database</button><button type="button" data-goto="datakvalitet">Metode og datakvalitet</button><button type="button" data-dialog="personvern">Personvern og lokal lagring</button></nav><div class="footer-about"><b>Steigen · Analyseportal</b><p>Et analysekonsept fra G-PSI. Kommunens navn og våpen identifiserer datagrunnlaget.</p><span id="genDate"></span></div></div><div class="footer-bottom"><span>© 2026 G-PSI GovTech Solutions</span><span>Database: kommunale regnskapsdata · SSB · eiendoms- og bygningsdata</span><button type="button" id="backTop">Til toppen ↑</button></div></footer>
+<dialog id="privacyDialog" aria-labelledby="privacyTitle"><h2 id="privacyTitle">Personvern og lokal lagring</h2><p>Portalen bruker ingen sporingsverktøy eller analyseinformasjonskapsler. Temavalget kan lagres lokalt i nettleseren. Kalkulatorens opplysninger behandles i nettleseren og sendes ikke til en server.</p><p>Privatpersoner i fakturagrunnlaget er samlet i en anonymisert kategori. Eiendomsskatt og bygningsdata vises som aggregater.</p><p>Bakgrunnskart lastes bare hvis du velger «Vis bakgrunnskart». Da mottar kartleverandøren vanlige tilkoblingsopplysninger, blant annet IP-adresse. Det innebygde kartet fungerer uten denne tjenesten.</p><button class="btn" type="button" id="closePrivacy">Lukk</button></dialog>
+</div>
+
+<script src="js/vendor/echarts.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/vendor/maplibre-gl.js"></script>
+<script src="js/vendor/chart.umd.min.js"></script>
+<script src="js/property-data.js"></script>
+<script src="js/calculator-config.js"></script>
+<script src="js/property.js"></script>
+<script src="js/calculator.js"></script>
+<script src="js/portal.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

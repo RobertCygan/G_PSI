@@ -1,0 +1,173 @@
+#eskatt-kalkulator{--c-primary-dark:var(--accent);--c-neutral-button:var(--text);--c-primary-light:var(--accent-soft);--c-paper:var(--panel-2);--c-warn:var(--accent-soft);--c-text:var(--text);--c-muted:var(--text-2);--c-line:var(--line-2);--c-field:var(--axis);--c-row:var(--panel-3);--c-error:var(--serious);font-size:15px;line-height:1.55;color:var(--text)}
+#eskatt-kalkulator *{box-sizing:border-box}
+#eskatt-kalkulator{-webkit-text-size-adjust:100%}
+#eskatt-kalkulator{margin:0;font-family:Inter,system-ui,sans-serif;font-size:17px;line-height:1.55;color:var(--c-text);background:var(--c-primary-light)}
+#eskatt-kalkulator a{color:inherit}
+#eskatt-kalkulator :focus-visible{outline:3px solid var(--c-neutral-button);outline-offset:2px}
+#eskatt-kalkulator .on-dark :focus-visible{outline-color:var(--panel)}
+#eskatt-kalkulator .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#eskatt-kalkulator .wrap{max-width:1152px;margin:0 auto;padding:0 24px}
+#eskatt-kalkulator .proto{background:var(--c-warn);color:var(--text);font-size:14px;text-align:center;padding:8px 16px}
+#eskatt-kalkulator .site-header{background:var(--panel)}
+#eskatt-kalkulator .site-header .wrap{display:flex;align-items:center;gap:28px;min-height:120px}
+#eskatt-kalkulator .site-header img{height:72px;width:auto;display:block}
+#eskatt-kalkulator .site-header nav{display:flex;gap:36px;flex:1;flex-wrap:wrap}
+#eskatt-kalkulator .site-header nav a{font-size:16px}
+#eskatt-kalkulator .hbtn{border:2px solid var(--text);border-radius:4px;padding:11px 26px;font-weight:500;background:var(--panel);display:inline-flex;gap:14px;align-items:center;font:inherit;font-weight:500}
+#eskatt-kalkulator .hbtn.dark{background:var(--c-primary-dark);border-color:var(--c-primary-dark);color:var(--panel)}
+#eskatt-kalkulator .site-footer{background:var(--c-primary-dark);color:var(--panel);padding:36px 0 48px;margin-top:64px;font-size:15px}
+@media (max-width:900px){#eskatt-kalkulator .site-header nav,#eskatt-kalkulator .hbtn.search{display:none}
+#eskatt-kalkulator .site-header .wrap{min-height:84px;justify-content:space-between}
+#eskatt-kalkulator .site-header img{height:52px}
+}
+#eskatt-kalkulator .crumbs{padding:24px 0 4px;font-size:15px;color:var(--c-neutral-button)}
+#eskatt-kalkulator .crumbs ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 10px}
+#eskatt-kalkulator .crumbs li+li::before{content:"›";margin-right:10px}
+#eskatt-kalkulator .crumbs [aria-current]{font-weight:600}
+#eskatt-kalkulator h1{font-size:clamp(30px,4vw,40px);line-height:1.2;margin:8px 0 10px;color:var(--c-neutral-button)}
+#eskatt-kalkulator .lead{max-width:760px;font-size:18px;margin:0 0 28px}
+#eskatt-kalkulator .esk-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;align-items:start}
+#eskatt-kalkulator .card{background:var(--panel);border-radius:var(--radius);padding:32px 36px}
+#eskatt-kalkulator .steps{display:flex;margin:0 0 30px;padding:0;list-style:none}
+#eskatt-kalkulator .steps li{flex:1;min-width:0;position:relative;text-align:center}
+#eskatt-kalkulator .steps li:not(:last-child)::after{content:"";position:absolute;top:16px;left:calc(50% + 24px);right:calc(-50% + 24px);height:2px;background:var(--c-line);pointer-events:none}
+#eskatt-kalkulator .steps li.done::after{background:var(--c-primary-dark)}
+#eskatt-kalkulator .steps button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;font-size:14px;font-weight:500;color:var(--c-muted);border-radius:4px;text-align:center}
+#eskatt-kalkulator .steps button:focus-visible{outline:3px solid var(--c-neutral-button);outline-offset:3px}
+#eskatt-kalkulator .steps .dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--c-line);background:var(--panel);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--c-muted)}
+#eskatt-kalkulator .steps li.done .dot{background:var(--c-primary-dark);border-color:var(--c-primary-dark);color:var(--panel)}
+#eskatt-kalkulator .steps li.current button{color:var(--c-neutral-button);font-weight:700}
+#eskatt-kalkulator .steps li.current .dot{border-color:var(--c-primary-dark);color:var(--c-primary-dark);box-shadow:0 0 0 4px var(--c-primary-light)}
+#eskatt-kalkulator .panel h2{font-size:24px;line-height:1.3;margin:0 0 6px;color:var(--c-neutral-button)}
+#eskatt-kalkulator .panel h2:focus{outline:none}
+#eskatt-kalkulator .sub{color:var(--c-muted);margin:0 0 22px}
+#eskatt-kalkulator fieldset{border:0;margin:0 0 26px;padding:0;min-width:0}
+#eskatt-kalkulator legend,#eskatt-kalkulator .lbl{font-weight:600;font-size:16px;padding:0;margin-bottom:8px;display:block}
+#eskatt-kalkulator .hint{font-size:14px;color:var(--c-muted);margin:-2px 0 10px}
+#eskatt-kalkulator .cards{display:grid;gap:10px}
+#eskatt-kalkulator .cards.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+#eskatt-kalkulator .cards.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+#eskatt-kalkulator .opt{position:relative;display:flex;gap:12px;align-items:flex-start;border:2px solid var(--c-line);border-radius:var(--radius);padding:13px 14px;cursor:pointer;background:var(--panel)}
+#eskatt-kalkulator .opt input{position:absolute;opacity:0;width:1px;height:1px}
+#eskatt-kalkulator .opt .mark{flex:none;width:22px;height:22px;border:2px solid var(--c-field);border-radius:50%;margin-top:1px;background:var(--panel)}
+#eskatt-kalkulator .opt input[type=checkbox]+.mark{border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--panel);font-size:14px;font-weight:700}
+#eskatt-kalkulator .opt b{display:block;font-weight:600;line-height:1.35}
+#eskatt-kalkulator .opt .opt-copy{min-width:0;overflow-wrap:anywhere}
+#eskatt-kalkulator .opt small{display:block;color:var(--c-muted);font-size:14px;line-height:1.4;margin-top:2px}
+#eskatt-kalkulator .opt:has(input:checked){border-color:var(--c-primary-dark);background:var(--c-row)}
+#eskatt-kalkulator .opt input:checked+.mark{border:7px solid var(--c-primary-dark)}
+#eskatt-kalkulator .opt input[type=checkbox]:checked+.mark{border:2px solid var(--c-primary-dark);background:var(--c-primary-dark)}
+#eskatt-kalkulator .opt input[type=checkbox]:checked+.mark::after{content:"✓"}
+#eskatt-kalkulator .opt:has(input:focus-visible){outline:3px solid var(--c-neutral-button);outline-offset:2px}
+#eskatt-kalkulator .opt:has(input:disabled){opacity:.45;cursor:not-allowed}
+#eskatt-kalkulator .opt .f{margin-left:auto;font-variant-numeric:tabular-nums;font-size:14px;color:var(--c-muted);white-space:nowrap}
+#eskatt-kalkulator .fields{display:grid;gap:16px 18px;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
+#eskatt-kalkulator #yearList .opt{flex-direction:column;gap:10px;min-height:108px}
+#eskatt-kalkulator #yearList .opt b{white-space:normal;font-size:15px}
+#eskatt-kalkulator #yearList .opt small{font-size:13px}
+#eskatt-kalkulator .field label{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
+#eskatt-kalkulator .inbox{display:flex;align-items:center;border:2px solid var(--c-field);border-radius:4px;background:var(--panel);height:48px;padding:0 12px;min-width:0;width:100%}
+#eskatt-kalkulator .inbox:focus-within{border-color:var(--c-primary-dark);box-shadow:0 0 0 3px var(--c-primary-light)}
+#eskatt-kalkulator .inbox input{all:unset;flex:1;min-width:0;font-size:17px;font-variant-numeric:tabular-nums}
+#eskatt-kalkulator .inbox span{color:var(--c-muted);font-size:15px;margin-left:8px}
+#eskatt-kalkulator .inbox:has(input:disabled){background:var(--panel-3)}
+#eskatt-kalkulator .field .fx{font-size:13px;color:var(--c-muted);margin-top:5px}
+#eskatt-kalkulator .floor-field{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(47px,auto) 48px auto;align-self:stretch;min-width:0}
+#eskatt-kalkulator .floor-field label{align-self:end;overflow-wrap:anywhere}
+#eskatt-kalkulator .floor-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;min-height:28px}
+#eskatt-kalkulator .floor-meta .fx{margin:0}
+#eskatt-kalkulator .floor-help{display:flex;align-items:center;justify-content:center;flex:none;width:28px;height:28px;border:1.5px solid var(--c-primary-dark);border-radius:50%;background:var(--panel);color:var(--c-primary-dark);font:inherit;font-size:15px;font-weight:700;cursor:help}
+#eskatt-kalkulator .floor-help:hover,#eskatt-kalkulator .floor-help[aria-expanded=true]{background:var(--c-primary-dark);color:var(--panel)}
+#eskatt-kalkulator .floor-tip{position:fixed;z-index:20;width:340px;max-width:calc(100vw - 24px);padding:18px 20px;border:1px solid var(--c-line);border-radius:8px;background:var(--panel);box-shadow:0 8px 32px rgba(0,54,64,.2);color:var(--c-text);font-size:14px;line-height:1.5;overflow-y:auto}
+#eskatt-kalkulator .floor-tip[hidden]{display:none}
+#eskatt-kalkulator .floor-tip strong{display:block;color:var(--c-neutral-button);font-size:15px;margin-bottom:8px}
+#eskatt-kalkulator .floor-tip p{margin:0 0 8px}
+#eskatt-kalkulator .floor-tip p:last-child{margin-bottom:0}
+#eskatt-kalkulator .floor-tip .tip-source{font-size:12px;color:var(--c-muted);margin-top:10px}
+#eskatt-kalkulator .field.err .inbox{border-color:var(--c-error)}
+#eskatt-kalkulator select{font:inherit;font-size:16px;width:100%;height:48px;border:2px solid var(--c-field);border-radius:4px;padding:0 12px;background:var(--panel);color:var(--text)}
+#eskatt-kalkulator select:focus-visible{outline:none;border-color:var(--c-primary-dark);box-shadow:0 0 0 3px var(--c-primary-light)}
+#eskatt-kalkulator .sum{font-size:14px;color:var(--c-muted);margin-top:12px}
+#eskatt-kalkulator .sum b{color:var(--text)}
+#eskatt-kalkulator .divider{height:1px;background:#D9E4E7;margin:6px 0 26px}
+#eskatt-kalkulator .error{color:var(--c-error);font-size:15px;font-weight:500;margin:8px 0 0}
+#eskatt-kalkulator .error:empty{display:none}
+#eskatt-kalkulator .blist{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+#eskatt-kalkulator .brow{display:grid;grid-template-columns:minmax(0,1fr) 150px auto;gap:12px;align-items:end;border:2px solid var(--c-line);border-radius:var(--radius);padding:14px}
+#eskatt-kalkulator .brow .tag{grid-column:1/-1;font-size:13px;font-weight:600;color:var(--c-neutral-button);background:var(--c-primary-light);border-radius:20px;padding:2px 10px;justify-self:start}
+#eskatt-kalkulator .empty{color:var(--c-muted);font-size:15px;border:2px dashed var(--c-line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+#eskatt-kalkulator .btn{font:inherit;font-weight:500;border-radius:4px;padding:13px 24px;cursor:pointer;border:2px solid var(--c-neutral-button);background:var(--c-neutral-button);color:var(--panel);display:inline-flex;align-items:center;gap:10px}
+#eskatt-kalkulator .btn.sec{background:var(--panel);color:var(--text);border-color:var(--text)}
+#eskatt-kalkulator .btn.small{padding:8px 14px;font-size:15px}
+#eskatt-kalkulator .btn.link{all:unset;cursor:pointer;text-decoration:underline;font-size:15px;color:var(--c-neutral-button);padding:10px 4px}
+#eskatt-kalkulator .btn.link:focus-visible{outline:3px solid var(--c-neutral-button);outline-offset:2px;border-radius:2px}
+#eskatt-kalkulator .nav{display:flex;justify-content:space-between;gap:12px;margin-top:30px;flex-wrap:wrap}
+#eskatt-kalkulator table{width:100%;border-collapse:collapse;font-size:15px}
+#eskatt-kalkulator caption{text-align:left;font-weight:600;font-size:17px;padding:0 0 8px;color:var(--c-neutral-button)}
+#eskatt-kalkulator th{text-align:left;font-weight:600;color:var(--c-muted);font-size:13px;padding:8px 6px;border-bottom:2px solid var(--c-neutral-button)}
+#eskatt-kalkulator td{padding:10px 6px;border-bottom:1px solid #DBE6E9;vertical-align:top}
+#eskatt-kalkulator td.n,#eskatt-kalkulator th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+#eskatt-kalkulator tr.tot td{font-weight:700;background:var(--c-row);border-bottom:2px solid var(--c-neutral-button)}
+#eskatt-kalkulator tr.op td{color:#1D2B2E}
+#eskatt-kalkulator td small{display:block;color:var(--c-muted);font-size:13px}
+#eskatt-kalkulator .free{color:var(--c-muted)}
+#eskatt-kalkulator .tablewrap{overflow-x:auto;margin-bottom:24px}
+#eskatt-kalkulator .missing{background:var(--c-warn);border-radius:var(--radius);padding:16px 18px;margin-bottom:20px}
+#eskatt-kalkulator .missing ul{margin:6px 0 0;padding-left:20px}
+#eskatt-kalkulator details{border:2px solid var(--c-line);border-radius:var(--radius);padding:12px 16px;margin-top:8px}
+#eskatt-kalkulator summary{cursor:pointer;font-weight:600;color:var(--c-neutral-button)}
+#eskatt-kalkulator details p{margin:10px 0 0;font-size:15px}
+#eskatt-kalkulator .formula{font-variant-numeric:tabular-nums;background:var(--c-row);border-radius:4px;padding:10px 12px;font-size:15px}
+#eskatt-kalkulator aside{position:sticky;top:20px}
+#eskatt-kalkulator .box{background:var(--c-primary-dark);color:var(--panel);border-radius:var(--radius);padding:26px 28px}
+#eskatt-kalkulator .box h2{margin:0;font-size:18px;font-weight:600}
+#eskatt-kalkulator .big{font-size:42px;font-weight:700;line-height:1.1;margin:10px 0 4px;font-variant-numeric:tabular-nums}
+#eskatt-kalkulator .box .unit{font-size:15px;opacity:.9}
+#eskatt-kalkulator .box hr{border:0;border-top:1px solid rgba(255,255,255,.28);margin:18px 0}
+#eskatt-kalkulator .kv{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:3px 0}
+#eskatt-kalkulator .kv b{font-variant-numeric:tabular-nums;white-space:nowrap}
+#eskatt-kalkulator .box h3{margin:0 0 6px;font-size:16px;font-weight:600}
+#eskatt-kalkulator .box .note{font-size:14px;opacity:.9}
+#eskatt-kalkulator .kv.cur{background:rgba(255,255,255,.12);border-radius:4px;padding:3px 8px;margin:0 -8px}
+#eskatt-kalkulator .info{background:var(--c-paper);border-radius:var(--radius);padding:18px 20px;margin-top:18px;font-size:15px;border-left:5px solid var(--c-primary-dark)}
+#eskatt-kalkulator .info p{margin:0 0 8px}
+#eskatt-kalkulator .info p:last-child{margin:0}
+#eskatt-kalkulator .mbar{display:none}
+@media (max-width:900px){#eskatt-kalkulator .esk-grid{grid-template-columns:1fr}
+#eskatt-kalkulator aside{position:static}
+#eskatt-kalkulator .card{padding:22px 18px}
+#eskatt-kalkulator .wrap{padding:0 16px}
+#eskatt-kalkulator .fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+#eskatt-kalkulator .cards.c4{grid-template-columns:repeat(2,minmax(0,1fr))}
+#eskatt-kalkulator .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--c-neutral-button);color:var(--panel);padding:10px 16px;justify-content:space-between;align-items:center;font-size:15px;box-shadow:0 -2px 8px rgba(0,0,0,.15)}
+#eskatt-kalkulator .mbar b{font-size:18px}
+#eskatt-kalkulator{padding-bottom:56px}
+#eskatt-kalkulator .steps .lab{display:none}
+#eskatt-kalkulator .steps li.current .lab{display:block}
+}
+@media (max-width:560px){#eskatt-kalkulator .site-header .wrap{gap:16px}
+#eskatt-kalkulator .site-header img{height:44px}
+#eskatt-kalkulator .hbtn.dark{padding:10px 14px;font-size:16px;gap:10px}
+#eskatt-kalkulator .cards.c2{grid-template-columns:1fr}
+#eskatt-kalkulator .brow{grid-template-columns:1fr 120px}
+#eskatt-kalkulator .brow .rm{grid-column:1/-1;justify-self:start}
+}
+@media (max-width:380px){#eskatt-kalkulator .fields{grid-template-columns:1fr}
+}
+@media print{#eskatt-kalkulator .proto,#eskatt-kalkulator .site-header,#eskatt-kalkulator .site-footer,#eskatt-kalkulator .crumbs,#eskatt-kalkulator .steps,#eskatt-kalkulator .nav,#eskatt-kalkulator .mbar,#eskatt-kalkulator aside .box,#eskatt-kalkulator .floor-tip,#eskatt-kalkulator .no-print{display:none!important}
+#eskatt-kalkulator{background:var(--panel);font-size:12pt}
+#eskatt-kalkulator .esk-grid{display:block}
+#eskatt-kalkulator .card{padding:0}
+#eskatt-kalkulator .panel{display:none!important}
+#eskatt-kalkulator .panel[data-step="4"]{display:block!important}
+#eskatt-kalkulator aside{position:static}
+}
+
+#eskatt-kalkulator .card{background:linear-gradient(180deg,var(--panel-2),var(--panel));padding:26px;border-radius:var(--radius);box-shadow:var(--shadow)}
+#eskatt-kalkulator .box{background:linear-gradient(145deg,var(--panel-3),var(--panel));color:var(--text);border:1px solid var(--accent);box-shadow:var(--glow)}
+#eskatt-kalkulator .big{font-family:var(--font-display);font-size:52px;color:var(--accent-2)}
+#eskatt-kalkulator .btn{border-radius:8px;color:var(--text);background:var(--accent-soft);border-color:var(--accent)}
+#eskatt-kalkulator .btn.sec{background:var(--panel-2);border-color:var(--line-2)}
+#eskatt-kalkulator aside{top:160px} #eskatt-kalkulator .floor-tip{z-index:80;background:var(--panel-2);box-shadow:var(--shadow)}
+#eskatt-kalkulator .mbar{position:static;margin-top:18px;border-radius:8px;background:var(--panel-3);color:var(--text)}
+#eskatt-kalkulator select{background:var(--panel-2);color:var(--text);max-width:100%}
