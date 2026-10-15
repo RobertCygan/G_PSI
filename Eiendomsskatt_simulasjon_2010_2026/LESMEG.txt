@@ -1,0 +1,56 @@
+Eiendomsskatt i Steigen kommune – lokal versjon
+
+Åpne eiendomsskatt-steigen.html (alt i én fil), eller åpne index.html med
+app.js, data.js og style.css i samme mappe. Krever internett for MapLibre,
+Chart.js og skrifter. Ingen installasjon er nødvendig for å åpne kartet.
+
+Endringer
+- Grunnkretsenes grenselinjer er fjernet, også ved peking og valg.
+- Navnene ligger på områdenes 3D-topp og følger høyde, måltall, år,
+  filtrering, zoom og kameravinkel. I 2D eller uten høyde ligger de på kartplanet.
+- Bygningstype og Bygningsstatus kan velges for både farge og høyde.
+  Velg deretter kategori, uavhengig for farge og høyde.
+
+Byggdata
+Kilde: Byggestatus.xlsm, arkene «Byggningstype » og «Byggningsstatus».
+78 typer og 13 statuser. 6 900 registreringer, 6 418 ulike bygningsnumre.
+Tallene følger de leverte oppsummeringene og er antall registreringer,
+ikke antall unike bygg. Tomme felter i oppsummeringene er tolket som null.
+«Andre» og «INGEN» samles som «Uten krets» (85 registreringer).
+Alle summer er kontrollert mot Status-arket og mot hverandre.
+
+Byggdata er tilstanden i kildefilen; arkene gir ingen historisk årsserie
+eller fritaksfordeling. År og fritak påvirker derfor bare skattedata.
+Farge viser antall i valgt kategori; høyde viser antall i sin valgte kategori.
+Når fargen viser byggdata, viser grafen fordeling per grunnkrets.
+Nøkkeltall beholder skattedata for valgt år og fritak. Tabellens Farge- og
+Høyde-kolonner viser valgte måltall og kategorier, også byggdata.
+Kun aggregater og grunnkretsgeometri er innebygd, ingen eiendomsrader.
+
+Oppdater byggdata med Python og openpyxl:
+  python prep_buildings.py /sti/til/Byggestatus.xlsm
+  python build_single.py
+
+prep_data.py er det opprinnelige skriptet for skatteaggregater. Det krever
+tilpasning av kildestier og den opprinnelige data.pkl-filen før bruk.
+build_single.py samler gjeldende index.html, style.css, data.js og app.js.
+
+Oppdatering 05.10.2026
+- Mørkt bakgrunnskart fra OpenFreeMap under Steigen-kartet.
+  Steigens geometri, høydeberegning og etiketthøyder er uendret.
+- Fritak, farge og høyde står i tre like brede felt ved høyrepanelet.
+- Gjennomsnitt og Endring fra året før er erstattet av de valgte
+  farge- og høydemåltallene. Enheter og kategorier følger valgene.
+  Sumraden beregner forholdstall for hele kommunen, ikke summen av kretsratene.
+  Ingen høyde skjuler Høyde-kolonnen. Skatt, Antall og Andel er fortsatt skattedata.
+- Startvalg: Total eiendomsskatt / Skatt per m², som i skjermbildet.
+- Årvelger, tidslinje 10–26 og Spill av er synkronisert. Aktivt år
+  er 12 px og fet skrift; øvrige år er 11 px. Årstallene kan klikkes.
+- Kortere tittel og innebygd Steigen kommune-logo.
+
+Kartbakgrunn: https://tiles.openfreemap.org/planet
+Kartkreditering: © OpenStreetMap contributors / OpenFreeMap
+Logo: https://www.steigen.kommune.no/handlers/bv.ashx/ib3023fb1-61fa-41dc-a53b-fecc78be652b/steigenlogo1.png
+Logoen er inkludert som steigen-logo.png og innebygd i enkeltfilen.
+Bakgrunnskartet krever internett. Hvis bakgrunnskilden er utilgjengelig,
+fungerer Steigen-kartet og analysen fortsatt.

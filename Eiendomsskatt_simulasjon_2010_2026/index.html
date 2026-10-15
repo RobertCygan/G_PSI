@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eiendomsskatt i Steigen</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <img class="kommune-logo" src="steigen-logo.png" alt="Steigen kommune" width="144" height="44">
+      <h1>Eiendomsskatt i Steigen kommune per grunnkrets</h1>
+    </div>
+    <div class="yearbox" role="group" aria-label="År">
+      <button class="btn icon" id="prevYear" title="Forrige år" aria-label="Forrige år">‹</button>
+      <label class="sr" for="yearSelect">Velg år</label>
+      <select class="yr num" id="yearSelect" aria-label="Velg år"></select>
+      <button class="btn icon" id="nextYear" title="Neste år" aria-label="Neste år">›</button>
+      <div class="year-track">
+        <label class="sr" for="yearSlider">År på tidslinjen</label>
+        <input type="range" id="yearSlider">
+        <div class="year-ticks" id="yearTicks" role="group" aria-label="Velg år på tidslinjen"></div>
+      </div>
+      <button class="btn" id="playBtn" aria-pressed="false" title="Spill av årene">▶ Spill av</button>
+    </div>
+    <div class="ctl">
+      <button class="btn primary" id="resetBtn">Nullstill valg</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="mapwrap" aria-label="Kart over grunnkretser">
+      <div id="map"></div>
+      <div class="nomap" id="nomap">Kartet kunne ikke tegnes (WebGL mangler). Tabellen og grafene til høyre fungerer fortsatt.</div>
+      <div class="mapbar">
+        <button class="btn card" id="ctlToggle" aria-expanded="true" aria-controls="mapctl" hidden>⚙ Kartvalg</button>
+        <div class="card mapctl" id="mapctl">
+          <div class="field"><label for="fritakSel">Fritak</label>
+            <select id="fritakSel">
+              <option value="all">Alle eiendommer</option>
+              <option value="tax">Kun skattepliktige</option>
+              <option value="ex">Kun fritatte (§ 5 / § 7)</option>
+            </select>
+          </div>
+          <div class="metric-fields">
+            <div class="field"><label for="colorSel">Velg måltall – farge</label><select id="colorSel"></select></div>
+            <div class="field" id="colorCategoryField" hidden><label id="colorCategoryLabel" for="colorCategory">Kategori – farge</label><select id="colorCategory"></select></div>
+          </div>
+          <div class="metric-fields">
+            <div class="field"><label for="heightSel">Velg måltall – høyde</label><select id="heightSel"></select></div>
+            <div class="field" id="heightCategoryField" hidden><label id="heightCategoryLabel" for="heightCategory">Kategori – høyde</label><select id="heightCategory"></select></div>
+          </div>
+          <div class="toggles">
+            <label><input type="checkbox" id="fixedScale" checked> Fast skala for alle år</label>
+            <label><input type="checkbox" id="quantScale"> Kvantilskala</label>
+            <label>Høyde <input type="range" id="exag" min="0.2" max="3" step="0.1" value="1" aria-label="Høydeoverdrivelse"></label>
+            <button class="btn" id="btn3d" aria-pressed="true">3D</button>
+            <button class="btn" id="btnView" title="Tilbakestill kartvinkel">Nullstill visning</button>
+          </div>
+        </div>
+      </div>
+      <div class="card legend" id="legend"></div>
+      <div class="card sel-chip" id="selChip" hidden>
+        <div class="name"><span id="selName"></span><small id="selSub"></small></div>
+        <button class="btn" id="selClear">Nullstill valg</button>
+      </div>
+      <div class="navbtns">
+        <button class="btn" id="zoomIn" aria-label="Zoom inn">+</button>
+        <button class="btn" id="zoomOut" aria-label="Zoom ut">−</button>
+      </div>
+      <div class="card tip" id="tip" role="tooltip"></div>
+      <div class="map-credit"><span id="basemapStatus" role="status"></span>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> · <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a></div>
+    </section>
+
+    <aside class="panel">
+      <div class="sec-h"><h2 id="scopeTitle">Hele kommunen</h2><span class="scope" id="scopeSub"></span></div>
+      <div class="kpis" id="kpis"></div>
+
+      <div class="sec-h">
+        <h2><span id="chartHeading">Utvikling</span> <span id="chartMetricName" style="font-weight:500;color:var(--muted)"></span></h2>
+        <div class="seg" id="chartViews" role="group" aria-label="Grafvisning">
+          <button id="viewLine" aria-pressed="true">Linje</button>
+          <button id="viewBars" aria-pressed="false">Topp 8 kretser</button>
+        </div>
+      </div>
+      <div class="chartbox"><canvas id="chart" aria-label="Utvikling over tid"></canvas></div>
+
+      <div class="sec-h"><h2>Grunnkretser <span id="tableYear" style="font-weight:500;color:var(--muted)"></span></h2>
+        <span class="scope">Klikk en rad for å velge</span></div>
+      <div class="tablewrap">
+        <table id="tbl">
+          <thead><tr>
+            <th data-k="navn" aria-sort="none">Grunnkrets<span class="arr"></span></th>
+            <th data-k="skatt" aria-sort="descending">Eiendomsskatt<span class="arr"></span></th>
+            <th data-k="n" aria-sort="none">Antall<span class="arr"></span></th>
+            <th data-k="colorValue" aria-sort="none"><small>Farge</small><span id="colorTableLabel"></span><span class="arr"></span></th>
+            <th data-k="heightValue" id="heightTableHeader" aria-sort="none"><small>Høyde</small><span id="heightTableLabel"></span><span class="arr"></span></th>
+            <th data-k="andel" aria-sort="none">Andel<span class="arr"></span></th>
+          </tr></thead>
+          <tbody></tbody>
+          <tfoot></tfoot>
+        </table>
+      </div>
+      <div class="table-note" id="tableMetricNote"></div>
+
+      <div class="note" id="datanote">
+        <h3>Datagrunnlag</h3>
+        <div id="noteBody"></div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<!-- Biblioteker fra CDN (krever internett) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
