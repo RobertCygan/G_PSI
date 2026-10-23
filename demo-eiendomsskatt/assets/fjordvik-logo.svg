@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 60" role="img" aria-label="Fjordvik kommune">
+  <path d="M5 4h40v24c0 14-9 23-20 28C14 51 5 42 5 28z" fill="#2a5e8c" stroke="#1b3d5c" stroke-width="1.6"/>
+  <path d="M5.8 28.5 15 16.5l5.6 6.8 6.8-10.2 7.9 11.3 4.5-4.5 4.4 6.1V28c0 2.3-.2 4.3-.7 6.2H6.5C6 32.3 5.8 30.4 5.8 28.5z" fill="#f5f1e8"/>
+  <path d="M7.4 38.2c3.4 0 3.4-2.5 6.8-2.5s3.4 2.5 6.8 2.5 3.4-2.5 6.8-2.5 3.4 2.5 6.8 2.5 3.4-2.5 6.8-2.5M10 44.4c2.9 0 2.9-2.2 5.8-2.2s2.9 2.2 5.8 2.2 2.9-2.2 5.8-2.2 2.9 2.2 5.8 2.2 2.9-2.2 5.8-2.2" fill="none" stroke="#f5f1e8" stroke-width="2" stroke-linecap="round"/>
+  <text x="56" y="34" font-family="Georgia,'Times New Roman',serif" font-size="30" fill="#231f20">Fjordvik</text>
+  <text x="59" y="51" font-family="Arial,Helvetica,sans-serif" font-size="9.5" letter-spacing="3.2" fill="#231f20">KOMMUNE</text>
+</svg>
