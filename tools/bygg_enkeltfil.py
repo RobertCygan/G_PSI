@@ -32,7 +32,8 @@ def main():
     html = re.sub(r'<link rel="stylesheet" href="([^"]+)">', css_block, html)
 
     html = re.sub(r'(src|href)="(assets/[^"]+)"', lambda m: m.group(1) + '="' + data_uri(root / m.group(2)) + '"', html)
-    left = re.findall(r'(?:src|href)="(?!data:|https?:|#|js/)([^"]+)"', html)
+    no_scripts = re.sub(r'<script src="[^"]+"></script>', '', html)
+    left = re.findall(r'(?:src|href)="(?!data:|https?:|#)([^"]+)"', no_scripts)
     if left:
         sys.exit('ikke innebygd: ' + ', '.join(left))
 
