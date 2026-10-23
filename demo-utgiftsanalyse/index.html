@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Utgiftsanalyse · demo</title>
+<meta name="description" content="Demo av G-PSI Utgiftsanalyse for kommuner 2016–2025: fakturagrunnlag og KOSTRA (SSB). Fiktiv kommune og fiktive data. Utviklet av G-PSI GovTech Solutions.">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="intro-active">
+
+<!-- ============================ INTRO ============================ -->
+<div id="intro" role="dialog" aria-label="Intro">
+  <video id="introVideo" muted playsinline preload="auto">
+    <source src="assets/video/intro.mp4" type="video/mp4">
+    <source src="assets/video/intro.webm" type="video/webm">
+  </video>
+  <div class="intro-sweep"></div>
+  <button class="intro-play" id="introPlay" type="button">▶ START</button>
+  <div class="intro-bar"><span id="introProgress"></span></div>
+  <div class="intro-tag">G-PSI GovTech Solutions · <span data-client="name"></span></div>
+  <button class="intro-skip" id="introSkip" type="button">Hopp over ›</button>
+</div>
+
+<!-- bakgrunn: kretsmønster + vannmerke -->
+<svg class="bg-circuit" aria-hidden="true" width="100%" height="100%">
+  <defs>
+    <pattern id="circ" width="220" height="220" patternUnits="userSpaceOnUse">
+      <path d="M0 40 H70 L90 60 H150 M150 60 V120 L170 140 H220 M30 220 V170 L50 150 H110 M110 150 V100" fill="none" stroke="rgba(92,200,255,.07)" stroke-width="1"/>
+      <circle cx="150" cy="60" r="2.2" fill="rgba(92,200,255,.16)"/>
+      <circle cx="110" cy="100" r="2.2" fill="rgba(92,200,255,.16)"/>
+      <circle cx="70" cy="40" r="1.6" fill="rgba(92,200,255,.12)"/>
+      <rect x="166" y="136" width="8" height="8" fill="none" stroke="rgba(92,200,255,.12)"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#circ)"/>
+</svg>
+<img class="bg-watermark" src="assets/img/gpsi-emblem.png" alt="" aria-hidden="true">
+
+<div id="app">
+  <!-- ============================ TOPP ============================ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="emblem"><span class="ring"></span><img src="assets/img/gpsi-emblem.png" alt="G-PSI"></div>
+      <div class="titles">
+        <div class="titlerow"><h1>UTGIFTSANALYSE</h1><span class="demo-badge" id="demoBadge" title="Fiktiv kommune og fiktive tall – kun for demonstrasjon">Demo</span></div>
+        <span class="sub"><b>G-PSI</b> Analytics · <span data-client="name"></span></span>
+      </div>
+    </div>
+    <nav class="pagenav" aria-label="Sider">
+      <button type="button" data-page="oversikt" aria-current="page" title="Oversikt">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg><span>Oversikt</span></button>
+      <button type="button" data-page="kategorier" title="Kategorianalyse">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Kategorier</span></button>
+      <button type="button" data-page="leverandorer" title="Leverandører">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 7h12v9H2zM14 10h4l3 3v3h-7z"/><circle cx="6" cy="18" r="2" fill="currentColor"/><circle cx="17" cy="18" r="2" fill="currentColor"/></svg><span>Leverandører</span></button>
+      <button type="button" data-page="kostra" title="KOSTRA">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg><span>KOSTRA</span></button>
+      <button type="button" data-page="transaksjoner" title="Transaksjoner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor"/></svg><span>Transaksjoner</span></button>
+      <button type="button" data-page="datakvalitet" title="Datakvalitet og metode">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>Datakvalitet</span></button>
+    </nav>
+    <div class="client">
+      <div class="client-logo" id="clientLogo" role="img" aria-label="Fjordvik kommune">
+        <svg class="crest" viewBox="0 0 40 48" aria-hidden="true">
+          <path d="M2 2h36v20c0 12-8 20-18 24C10 42 2 34 2 22z" fill="#2a5e8c" stroke="#c9d6e3" stroke-width="1.6"/>
+          <path d="M2.8 22.5 11 12l5 6 6-9 7 10 4-4 4.2 5.5V22c0 2-.2 3.8-.6 5.5H3.4C3 25.8 2.8 24.2 2.8 22.5z" fill="#e9eef4"/>
+          <path d="M4.2 31c3 0 3-2.2 6-2.2s3 2.2 6 2.2 3-2.2 6-2.2 3 2.2 6 2.2 3-2.2 6-2.2c.3 0 .6 0 .9.1M6.4 36.5c2.6 0 2.6-2 5.2-2s2.6 2 5.2 2 2.6-2 5.2-2 2.6 2 5.2 2 2.6-2 5.2-2" fill="none" stroke="#e9eef4" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span class="wordmark"><span data-client="short"></span><small>Kommune</small></span>
+      </div>
+      <div class="period">2016 – 2025<small>Regnskapsår</small></div>
+      <button class="icon-btn" id="themeBtn" type="button" title="Bytt lyst/mørkt tema" aria-label="Bytt tema">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ======================= VERKTØYLINJE ======================= -->
+    <div class="toolbar">
+      <div id="toolbarLeft"></div>
+      <div class="filters" id="filters">
+        <div class="fld"><label for="fYear">År</label><div class="sel"><select id="fYear"></select></div></div>
+        <div class="fld"><label for="fQ">Kvartal</label><div class="sel"><select id="fQ">
+          <option value="">Alle</option><option value="1">K1</option><option value="2">K2</option><option value="3">K3</option><option value="4">K4</option></select></div></div>
+        <div class="fld"><label for="fTO">Tjenesteområde</label><div class="sel"><select id="fTO"></select></div></div>
+        <div class="fld"><label for="fReg">Regnskap</label><div class="sel"><select id="fReg">
+          <option value="">Drift + investering</option><option value="drift">Drift</option><option value="inv">Investering</option></select></div></div>
+        <div class="fld f-measure"><span class="lbl">Visning</span>
+          <div class="seg" id="fMeasure" role="group" aria-label="Visning">
+            <button type="button" data-m="nom" aria-pressed="true" title="Løpende kroner">Nominelt</button>
+            <button type="button" data-m="real" aria-pressed="false" title="Faste 2025-kroner, deflatert med KPI (SSB 03014)">2025-kr</button>
+            <button type="button" data-m="cap" aria-pressed="false" title="Kroner per innbygger (folkemengde 31.12)">Per innb.</button>
+            <button type="button" data-m="capreal" aria-pressed="false" title="Faste 2025-kr per innbygger">Per innb. 2025-kr</button>
+          </div></div>
+        <div class="fld"><span class="lbl">&nbsp;</span><label class="switch" title="Ta med kompensasjonsberettiget merverdiavgift (art 429)"><input type="checkbox" id="fMva"> Inkl. mva</label></div>
+        <div class="fld"><span class="lbl">&nbsp;</span><button class="reset" id="fReset" type="button" title="Nullstill alle filtre" aria-label="Nullstill filtre">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button></div>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+
+    <!-- ============================ OVERSIKT ============================ -->
+    <section class="page active" id="p-oversikt" aria-label="Oversikt">
+      <div id="ovWarn"></div>
+      <div class="insights" id="insights" aria-label="Nøkkelfunn"></div>
+      <div class="grid-ov">
+        <div class="card c-bars">
+          <div class="card-head"><div><h3>Utgifter etter tjenesteområde</h3><p class="cap" id="capBars">Drift og investering · klikk en stolpe for å filtrere</p></div></div>
+          <div class="chart tall" id="chBars"></div>
+          <div class="src" id="srcBars"></div>
+        </div>
+        <div class="card c-donut">
+          <div class="card-head"><div><h3>Fordeling etter art</h3><p class="cap">KOSTRA-artsgrupper · klikk et segment for å filtrere</p></div></div>
+          <div class="chart tall" id="chDonut"></div>
+          <div class="src" id="srcDonut"></div>
+        </div>
+        <div class="card c-tree">
+          <div class="card-head"><div><h3>Vare-/tjenestegruppe og konto</h3><p class="cap">Klikk en gruppe for å filtrere · ⊞ for å åpne</p></div></div>
+          <div class="tree" id="tree"></div>
+          <div class="src" id="srcTree"></div>
+        </div>
+        <div class="card c-trend">
+          <div class="card-head"><div><h3>Utvikling 2016–2025</h3><p class="cap" id="trendCap">Nominelt og i faste 2025-kroner (KPI)</p></div>
+            <div class="card-tools"><div class="seg" id="trendGran"><button type="button" data-g="y" aria-pressed="true">År</button><button type="button" data-g="q" aria-pressed="false">Kvartal</button><button type="button" data-g="m" aria-pressed="false">Måned</button></div></div></div>
+          <div class="chart" id="chTrend"></div>
+          <div class="src" id="srcTrend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ KATEGORIER ============================ -->
+    <section class="page" id="p-kategorier" aria-label="Kategorianalyse">
+      <div class="card">
+        <div class="card-head">
+          <div><h3>Første og siste år, endring og CAGR</h3><p class="cap" id="catCap"></p></div>
+          <div class="card-tools">
+            <div class="seg" id="catSrc"><button type="button" data-s="kostra" aria-pressed="true">KOSTRA (SSB)</button><button type="button" data-s="faktura" aria-pressed="false">Fakturagrunnlag</button></div>
+            <div class="sel"><select id="catDim" aria-label="Dimensjon"></select></div>
+            <div class="sel"><select id="catFrom" aria-label="Fra år"></select></div>
+            <div class="sel"><select id="catTo" aria-label="Til år"></select></div>
+          </div>
+        </div>
+        <div id="catWarn"></div>
+        <div class="dtable-wrap" id="catTable" style="max-height:none"></div>
+        <div class="src" id="srcCat"></div>
+      </div>
+      <div class="grid-21 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Utvikling per kategori</h3><p class="cap" id="heatCap">Varmekart, beløp per år</p></div>
+            <div class="card-tools"><div class="seg" id="heatMode"><button type="button" data-h="abs" aria-pressed="true">Beløp</button><button type="button" data-h="share" aria-pressed="false">Andel %</button><button type="button" data-h="idx" aria-pressed="false">Indeks</button></div></div></div>
+          <div class="chart tall" id="chHeat"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Bidrag til endring</h3><p class="cap" id="wfCap">Realendring fra første til siste år</p></div></div>
+          <div class="chart tall" id="chWaterfall"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ LEVERANDØRER ============================ -->
+    <section class="page" id="p-leverandorer" aria-label="Leverandører">
+      <div class="grid-21">
+        <div class="card">
+          <div class="card-head"><div><h3>Største leverandører</h3><p class="cap">Topp 15 · klikk for å filtrere hele dashboardet</p></div></div>
+          <div class="chart tall" id="chTopLev"></div>
+          <div class="src" id="srcTopLev"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Konsentrasjon</h3><p class="cap" id="paretoCap">Kumulativ andel av utgiftene</p></div></div>
+          <div class="chart tall" id="chPareto"></div>
+        </div>
+      </div>
+      <div class="grid-12 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Leverandørbransjer</h3><p class="cap">Bransje hovedkategori</p></div></div>
+          <div class="chart tall" id="chBransje"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Leverandørregister</h3><p class="cap" id="levCap"></p></div></div>
+          <div class="tbl-tools">
+            <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="levSearch" type="search" placeholder="Søk leverandør eller bransje…"></div>
+          </div>
+          <div class="dtable-wrap" id="levTable" style="max-height:420px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ KOSTRA ============================ -->
+    <section class="page" id="p-kostra" aria-label="KOSTRA">
+      <div class="kpis" id="kostraKpis"></div>
+      <div class="grid-2 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Brutto driftsutgifter</h3><p class="cap">Mill. kr, nominelt og i faste 2025-kroner (KPI)</p></div></div>
+          <div class="chart" id="chKTot"></div>
+          <div class="src">Kilde: <b>SSB tabell 12362</b> (kommunekonsern, sum funksjoner 100–393), KPI fra <b>SSB 03014</b>, 2016–2025.</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Utgifter etter art</h3><p class="cap">Mill. kr, kommunekasse</p></div>
+            <div class="card-tools"><div class="seg" id="kArtMode"><button type="button" data-a="nom" aria-pressed="true">Nominelt</button><button type="button" data-a="real" aria-pressed="false">2025-kr</button></div></div></div>
+          <div class="chart" id="chKArt"></div>
+          <div class="src">Kilde: <b>SSB tabell 12367</b> (kommunekasse), 2016–2025. Lønn er fratrukket sykelønnsrefusjon (art 710).</div>
+        </div>
+      </div>
+      <div class="grid-21 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Per innbygger mot sammenlignbare kommuner</h3><p class="cap" id="kCmpCap"></p></div>
+            <div class="card-tools">
+              <div class="seg" id="kCmpArt"><button type="button" data-k="AGD10" aria-pressed="true">Brutto</button><button type="button" data-k="AGD2" aria-pressed="false">Netto</button></div>
+              <div class="sel"><select id="kCmpYear" aria-label="År"></select></div>
+            </div></div>
+          <div class="chart" id="chKCmp" style="height:600px"></div>
+          <div class="src">Kilde: <b>SSB tabell 12362</b>, kr per innbygger, KOSTRA-tjenesteområder (FGK). Områdene overlapper delvis (eiendomsforvaltning inngår også i andre områder).</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Totalt per innbygger</h3><p class="cap">Brutto driftsutgifter, kr per innbygger (nominelt)</p></div></div>
+          <div class="chart" id="chKCap" style="height:600px"></div>
+          <div class="src">Kilde: <b>SSB tabell 12362</b>. Brudd i KOSTRA-gruppene mellom 2019 og 2020.</div>
+        </div>
+      </div>
+      <div class="grid-12 mt">
+        <div class="card">
+          <div class="card-head"><div><h3>Brutto investeringsutgifter</h3><p class="cap">Mill. kr, <span data-client="short"></span></p></div></div>
+          <div class="chart" id="chKInv"></div>
+          <div class="src">Kilde: <b>SSB tabell 12362</b> (AGI5), 2016–2025.</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Avvik mot KOSTRA-gruppe 6</h3><p class="cap" id="kDevCap"></p></div></div>
+          <div class="dtable-wrap" id="kDevTable" style="max-height:380px"></div>
+          <div class="src">Beregnet: (<span data-client="short"></span> − KOSTRA-gruppe 6) × innbyggere 31.12. Viser hva utgiftsnivået ville vært med gruppens nivå per innbygger – ikke et innsparingsestimat (struktur, bosettingsmønster og kvalitet er ikke justert).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ TRANSAKSJONER ============================ -->
+    <section class="page" id="p-transaksjoner" aria-label="Transaksjoner">
+      <div class="card">
+        <div class="card-head"><div><h3>Fakturalinjer</h3><p class="cap" id="txCap"></p></div></div>
+        <div class="tbl-tools">
+          <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="txSearch" type="search" placeholder="Søk leverandør, konto, funksjon, bilag…"></div>
+          <button class="btn" id="txCsv" type="button">⭳ Last ned CSV</button>
+          <span class="muted small" id="txInfo"></span>
+        </div>
+        <div class="dtable-wrap" id="txTable" style="max-height:640px"></div>
+        <div class="pager" id="txPager"></div>
+      </div>
+    </section>
+
+    <!-- ============================ DATAKVALITET ============================ -->
+    <section class="page" id="p-datakvalitet" aria-label="Datakvalitet og metode">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head"><div><h3>Dekning: fakturagrunnlag mot KOSTRA</h3><p class="cap">Driftskjøp og overføringer (ekskl. mva), mill. kr</p></div></div>
+          <div class="chart" id="chCov"></div>
+          <div class="src">Fakturagrunnlag: <b data-src></b>, driftsregnskap, art 100–480 ekskl. 429. KOSTRA: <b>SSB 12367</b> kommunekasse, AGD50 + AGD51 + AG34.</div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h3>Fakturalinjer per måned og bilagsserie</h3><p class="cap">Antall utgiftslinjer i uttrekket per måned</p></div></div>
+          <div class="chart" id="chLines"></div>
+          <div class="src">Kilde: <b data-src></b>, bilagsnummer gruppert etter serie.</div>
+        </div>
+      </div>
+      <div class="grid-2 mt">
+        <div class="card">
+          <h3>Hendelser og brudd i seriene</h3>
+          <p class="cap">Fakta = dokumentert i data · Hypotese = mulig forklaring som må verifiseres</p>
+          <div class="events" id="events"></div>
+        </div>
+        <div class="card method" id="method"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="by"><img src="assets/img/gpsi-logo.png" alt="G-PSI GovTech Solutions"><div><b>G-PSI GOVTECH SOLUTIONS</b><br>Utgiftsanalyse for <span data-client="name"></span> · <span id="genDate"></span></div></div>
+    <div id="footSrc"></div>
+  </footer>
+</div>
+
+<script src="js/vendor/echarts.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
